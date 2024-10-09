@@ -1,0 +1,16 @@
+{
+  "name": "sol_herebot",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "fuse.js": "^7.0.0",
+    "node-fetch": "^3.3.2"
+  }
+}
