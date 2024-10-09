@@ -1,5 +1,7 @@
 # sol_herebot
 
+![sol heredit](assets/smol_heredit.png)
+
 Sol Herebot is the champion of OSRS Discord Bots!
 
 > [!IMPORTANT]
