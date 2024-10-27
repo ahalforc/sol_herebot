@@ -28,7 +28,7 @@ client.once(Events.ClientReady, async c => {
     // Fetch and cache all osrs items (to be used as reference later).
     try {
         console.log(`Fetching all osrs items...`);
-        //await loadAllItems();
+        await loadAllItems();
         console.log(`Fetched all items.`);
     } catch (error) {
         console.log(`Failed to fetch all items, terminating early. Error: ${error}`);
@@ -87,7 +87,10 @@ client.on(Events.InteractionCreate, async interaction => {
         }
     } catch (error) {
         console.log(`${interaction.commandName} failed with error ${error}.`);
-        await interaction.reply(`Failed to process command ${interaction.commandName}.`);
+        await interaction.reply({
+            content: `Failed to process command ${interaction.commandName}.`,
+            ephemeral: true,
+        });
     }
 });
 
