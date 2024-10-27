@@ -1,0 +1,478 @@
+[
+    {
+        "id": 1,
+        "name": "Cat",
+        "activity": "Gertrude, after completing Gertrude's Cat",
+        "dropRate": "N/A",
+        "releaseDate": "28 July 2003"
+    },
+    {
+        "id": 2,
+        "name": "Pet fish",
+        "activity": "Caught in Harry's Fishing Shop",
+        "dropRate": "N/A",
+        "releaseDate": "24 October 2005"
+    },
+    {
+        "id": 3,
+        "name": "Hellcat",
+        "activity": "Catching Hell-Rats with a cat",
+        "dropRate": "N/A",
+        "releaseDate": "15 March 2006"
+    },
+    {
+        "id": 4,
+        "name": "Toy cat",
+        "activity": "Clockwork and a regular plank used at a crafting table 4 with 85 Crafting",
+        "dropRate": "N/A",
+        "releaseDate": "31 May 2006"
+    },
+    {
+        "id": 5,
+        "name": "Pet chaos elemental",
+        "activity": "Chaos Elemental and Chaos Fanatic",
+        "dropRate": "1/300 (Elemental) 1/1,000 (Fanatic)",
+        "releaseDate": "3 April 2014"
+    },
+    {
+        "id": 6,
+        "name": "Baby mole",
+        "activity": "Giant Mole",
+        "dropRate": "1/3,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 7,
+        "name": "Kalphite princess",
+        "activity": "Kalphite Queen",
+        "dropRate": "1/3,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 8,
+        "name": "Pet dagannoth prime",
+        "activity": "Dagannoth Prime",
+        "dropRate": "1/5,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 9,
+        "name": "Pet dagannoth rex",
+        "activity": "Dagannoth Rex",
+        "dropRate": "1/5,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 10,
+        "name": "Pet dagannoth supreme",
+        "activity": "Dagannoth Supreme",
+        "dropRate": "1/5,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 11,
+        "name": "Pet general graardor",
+        "activity": "General Graardor",
+        "dropRate": "1/5,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 12,
+        "name": "Pet k'ril tsutsaroth",
+        "activity": "K'ril Tsutsaroth",
+        "dropRate": "1/5,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 13,
+        "name": "Pet kraken",
+        "activity": "Kraken",
+        "dropRate": "1/3,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 14,
+        "name": "Pet kree'arra",
+        "activity": "Kree'arra",
+        "dropRate": "1/5,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 15,
+        "name": "Pet smoke devil",
+        "activity": "Thermonuclear smoke devil",
+        "dropRate": "1/3,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 16,
+        "name": "Pet zilyana",
+        "activity": "Commander Zilyana",
+        "dropRate": "1/5,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 17,
+        "name": "Prince black dragon",
+        "activity": "King Black Dragon",
+        "dropRate": "1/3,000",
+        "releaseDate": "17 July 2014"
+    },
+    {
+        "id": 18,
+        "name": "Pet penance queen",
+        "activity": "Barbarian Assault",
+        "dropRate": "1/1,000",
+        "releaseDate": "14 August 2014"
+    },
+    {
+        "id": 19,
+        "name": "Pet dark core",
+        "activity": "Corporeal Beast",
+        "dropRate": "1/5,000",
+        "releaseDate": "16 October 2014"
+    },
+    {
+        "id": 20,
+        "name": "Pet snakeling",
+        "activity": "Zulrah",
+        "dropRate": "1/4,000",
+        "releaseDate": "8 January 2015"
+    },
+    {
+        "id": 21,
+        "name": "Chompy chick",
+        "activity": "Dropped by chompy birds after completing the  Elite Western Provinces Diary",
+        "dropRate": "1/500",
+        "releaseDate": "5 March 2015"
+    },
+    {
+        "id": 22,
+        "name": "Callisto cub",
+        "activity": "Callisto and Artio",
+        "dropRate": "1/1,500 (Callisto) 1/2,800 (Artio)",
+        "releaseDate": "19 March 2015"
+    },
+    {
+        "id": 23,
+        "name": "Scorpia's offspring",
+        "activity": "Scorpia",
+        "dropRate": "1/2,015.75",
+        "releaseDate": "19 March 2015"
+    },
+    {
+        "id": 24,
+        "name": "Venenatis spiderling",
+        "activity": "Venenatis and Spindel",
+        "dropRate": "1/1,500 (Venenatis) 1/2,800 (Spindel)",
+        "releaseDate": "19 March 2015"
+    },
+    {
+        "id": 25,
+        "name": "Vet'ion jr.",
+        "activity": "Vet'ion and Calvar'ion",
+        "dropRate": "1/1,500 (Vet'ion) 1/2,800 (Calvar'ion)",
+        "releaseDate": "19 March 2015"
+    },
+    {
+        "id": 26,
+        "name": "Tzrek-jad",
+        "activity": "TzHaar Fight Cave",
+        "dropRate": "1/200 (per kill or gamble) 1/100 (per kill on Slayer task)",
+        "releaseDate": "6 August 2015"
+    },
+    {
+        "id": 27,
+        "name": "Hellpuppy",
+        "activity": "Cerberus",
+        "dropRate": "1/3,000",
+        "releaseDate": "27 August 2015"
+    },
+    {
+        "id": 28,
+        "name": "Abyssal orphan",
+        "activity": "Abyssal Sire",
+        "dropRate": "1/2,560[b]",
+        "releaseDate": "1 October 2015"
+    },
+    {
+        "id": 29,
+        "name": "Baby chinchompa",
+        "activity": "Obtained while Hunting chinchompas",
+        "dropRate": "See here",
+        "releaseDate": "5 November 2015"
+    },
+    {
+        "id": 30,
+        "name": "Beaver",
+        "activity": "Obtained while Woodcutting",
+        "dropRate": "See here",
+        "releaseDate": "5 November 2015"
+    },
+    {
+        "id": 31,
+        "name": "Heron",
+        "activity": "Obtained while Fishing",
+        "dropRate": "See here",
+        "releaseDate": "5 November 2015"
+    },
+    {
+        "id": 32,
+        "name": "Rock golem",
+        "activity": "Obtained while Mining",
+        "dropRate": "See here",
+        "releaseDate": "5 November 2015"
+    },
+    {
+        "id": 33,
+        "name": "Pet rock",
+        "activity": "Askeladden, after  The Fremennik Trials",
+        "dropRate": "N/A",
+        "releaseDate": "3 March 2016"
+    },
+    {
+        "id": 34,
+        "name": "Bloodhound",
+        "activity": "Master clue scrolls",
+        "dropRate": "1/1,000",
+        "releaseDate": "6 July 2016"
+    },
+    {
+        "id": 35,
+        "name": "Giant squirrel",
+        "activity": "Obtained while training Agility",
+        "dropRate": "See here",
+        "releaseDate": "1 September 2016"
+    },
+    {
+        "id": 36,
+        "name": "Rift guardian",
+        "activity": "Obtained while training Runecraft",
+        "dropRate": "See here",
+        "releaseDate": "1 September 2016"
+    },
+    {
+        "id": 37,
+        "name": "Rocky",
+        "activity": "Obtained while Thieving",
+        "dropRate": "See here",
+        "releaseDate": "1 September 2016"
+    },
+    {
+        "id": 38,
+        "name": "Tangleroot",
+        "activity": "Obtained while Farming",
+        "dropRate": "See here",
+        "releaseDate": "1 September 2016"
+    },
+    {
+        "id": 39,
+        "name": "Phoenix",
+        "activity": "Wintertodt",
+        "dropRate": "1/5,000[e]",
+        "releaseDate": "8 September 2016"
+    },
+    {
+        "id": 40,
+        "name": "Olmlet",
+        "activity": "Chambers of Xeric",
+        "dropRate": "1/53 (per broadcasted unique item)",
+        "releaseDate": "5 January 2017"
+    },
+    {
+        "id": 41,
+        "name": "Skotos",
+        "activity": "Skotizo",
+        "dropRate": "1/65",
+        "releaseDate": "4 May 2017"
+    },
+    {
+        "id": 42,
+        "name": "Jal-nib-rek",
+        "activity": "Inferno",
+        "dropRate": "1/100 (per kill or gamble) 1/75 (per kill on Slayer task)",
+        "releaseDate": "1 June 2017"
+    },
+    {
+        "id": 43,
+        "name": "Herbi",
+        "activity": "Hunting herbiboars",
+        "dropRate": "1/6,500",
+        "releaseDate": "7 September 2017"
+    },
+    {
+        "id": 44,
+        "name": "Noon",
+        "activity": "Grotesque Guardians",
+        "dropRate": "1/3,000",
+        "releaseDate": "26 October 2017"
+    },
+    {
+        "id": 45,
+        "name": "Vorki",
+        "activity": "Vorkath",
+        "dropRate": "1/3,000",
+        "releaseDate": "4 January 2018"
+    },
+    {
+        "id": 46,
+        "name": "Lil' zik",
+        "activity": "Theatre of Blood",
+        "dropRate": "1/650 (Normal mode) 1/500 (Hard mode)[c]",
+        "releaseDate": "7 June 2018"
+    },
+    {
+        "id": 47,
+        "name": "Ikkle hydra",
+        "activity": "Alchemical Hydra",
+        "dropRate": "1/3,000",
+        "releaseDate": "10 January 2019"
+    },
+    {
+        "id": 48,
+        "name": "Sraracha",
+        "activity": "Sarachnis",
+        "dropRate": "1/3,000",
+        "releaseDate": "4 July 2019"
+    },
+    {
+        "id": 49,
+        "name": "Smolcano",
+        "activity": "Zalcano",
+        "dropRate": "1/2,250",
+        "releaseDate": "25 July 2019"
+    },
+    {
+        "id": 50,
+        "name": "Youngllef",
+        "activity": "The Gauntlet",
+        "dropRate": "1/2,000 (normal Gauntlet) 1/800 (Corrupted Gauntlet)",
+        "releaseDate": "25 July 2019"
+    },
+    {
+        "id": 51,
+        "name": "Little nightmare",
+        "activity": "The Nightmare",
+        "dropRate": "1/800 to 1/4,000 (From 1 to 5+ team size)",
+        "releaseDate": "6 February 2020"
+    },
+    {
+        "id": 52,
+        "name": "Lil' creator",
+        "activity": "Soul Wars",
+        "dropRate": "1/400",
+        "releaseDate": "6 January 2021"
+    },
+    {
+        "id": 53,
+        "name": "Tiny tempor",
+        "activity": "Tempoross",
+        "dropRate": "1/8,000",
+        "releaseDate": "24 March 2021"
+    },
+    {
+        "id": 54,
+        "name": "Nexling",
+        "activity": "Nex",
+        "dropRate": "1/500",
+        "releaseDate": "5 January 2022"
+    },
+    {
+        "id": 55,
+        "name": "Abyssal protector",
+        "activity": "Guardians of the Rift",
+        "dropRate": "1/4,000",
+        "releaseDate": "23 March 2022"
+    },
+    {
+        "id": 56,
+        "name": "Tumeken's guardian",
+        "activity": "Tombs of Amascut",
+        "dropRate": "Varies[h]",
+        "releaseDate": "24 August 2022"
+    },
+    {
+        "id": 57,
+        "name": "Muphin",
+        "activity": "Phantom Muspah",
+        "dropRate": "1/2,500",
+        "releaseDate": "11 January 2023"
+    },
+    {
+        "id": 58,
+        "name": "Baron",
+        "activity": "Duke Sucellus",
+        "dropRate": "1/2,500",
+        "releaseDate": "26 July 2023"
+    },
+    {
+        "id": 59,
+        "name": "Butch",
+        "activity": "Vardorvis",
+        "dropRate": "1/3,000",
+        "releaseDate": "26 July 2023"
+    },
+    {
+        "id": 60,
+        "name": "Lil'viathan",
+        "activity": "The Leviathan",
+        "dropRate": "1/2,500",
+        "releaseDate": "26 July 2023"
+    },
+    {
+        "id": 61,
+        "name": "Wisp",
+        "activity": "The Whisperer",
+        "dropRate": "1/2,000",
+        "releaseDate": "26 July 2023"
+    },
+    {
+        "id": 62,
+        "name": "Scurry",
+        "activity": "Scurrius",
+        "dropRate": "1/3,000[f]",
+        "releaseDate": "24 January 2024"
+    },
+    {
+        "id": 63,
+        "name": "Smol heredit",
+        "activity": "Sol Heredit",
+        "dropRate": "1/200 (per kill or gamble)",
+        "releaseDate": "20 March 2024"
+    },
+    {
+        "id": 64,
+        "name": "Quetzin",
+        "activity": "Expert and Master Hunter's guild rumours",
+        "dropRate": "1/1,000[a]",
+        "releaseDate": "20 March 2024"
+    },
+    {
+        "id": 65,
+        "name": "Broav",
+        "activity": "Hunting Expert during While Guthix Sleeps",
+        "dropRate": "N/A",
+        "releaseDate": "10 July 2024"
+    },
+    {
+        "id": 66,
+        "name": "Nid",
+        "activity": "Araxxor",
+        "dropRate": "1/3,000",
+        "releaseDate": "28 August 2024"
+    },
+    {
+        "id": 67,
+        "name": "Huberte",
+        "activity": "The Hueycoatl",
+        "dropRate": "1/400",
+        "releaseDate": "25 September 2024"
+    },
+    {
+        "id": 68,
+        "name": "Moxi",
+        "activity": "Amoxliatl",
+        "dropRate": "1/3,000",
+        "releaseDate": "25 September 2024"
+    }
+]

@@ -20,6 +20,35 @@ const commands = [
         )
         .toJSON(),
     new SlashCommandBuilder()
+        .setName('viewallpets')
+        .setDescription('Spews out a response of all pets in osrs')
+        .toJSON(),
+    new SlashCommandBuilder()
+        .setName('obtainedpets')
+        .setDescription('Spews out a response of all pets you have acquired')
+        .toJSON(),
+    new SlashCommandBuilder()
+        .setName('addobtainedpets')
+        .setDescription('Registers your discord user with the given pet ids (comma separated list of ids)')
+        .addStringOption(option =>
+            option
+                .setName('petids')
+                .setDescription('What pets did you get?')
+                .setRequired(true),
+        ),
+    new SlashCommandBuilder()
+        .setName('removeobtainedpets')
+        .setDescription('Un-registers your discord user with the given pet ids (comma separated list of ids)')
+        .addStringOption(option =>
+            option
+                .setName('petids')
+                .setDescription('What pets did you actually not get?')
+                .setRequired(true),
+        ),
+    new SlashCommandBuilder()
+        .setName('randompet')
+        .setDescription('Gives you a random pet to hunt for (filters out obtained pets)'),
+    new SlashCommandBuilder()
         .setName('randomraid')
         .setDescription('Gives you a random raid (or group boss)')
         .toJSON(),
