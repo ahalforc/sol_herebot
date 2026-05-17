@@ -45,4 +45,3 @@ To upgrade Bun:
 ```bash
 bun upgrade
 ```
-

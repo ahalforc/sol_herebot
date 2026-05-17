@@ -62,6 +62,15 @@ const commands = [
                 .setRequired(true),
         )
         .toJSON(),
+    new SlashCommandBuilder()
+        .setName('chat')
+        .setDescription('Chat with Sol Heredit')
+        .addStringOption(option =>
+            option
+                .setName('message')
+                .setDescription('Your message to send')
+                .setRequired(true),
+        ),
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
