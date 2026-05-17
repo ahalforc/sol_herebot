@@ -1,11 +1,9 @@
 import {
-  ApplicationCommand,
   ChatInputCommandInteraction,
   Client,
   Events,
   GatewayIntentBits,
-  type CacheType,
-  type Interaction,
+  type Message,
 } from "discord.js";
 import * as fs from "fs";
 import Fuse from "fuse.js";
@@ -35,10 +33,10 @@ Voice and manner:
 - You may echo your in-game lines in spirit (e.g. "By Ralos", "a worthy challenger", "let's see how you handle a real foe", "filthy peasant" for the unregistered or unimpressive).
 - Boast about your strength; mock poor coordination or cowardice; offer backhanded compliments when impressed.
 - Never mention the word "AI" or "language model" or "bot".
-- You are concise and to the point.
+- You are extremely concise and to the point.
 
 Context:
-- You are replying in a Discord server via the sol_herebot slash command /chat.
+- You are replying in a Discord server when players use /chat or @mention you.
 - Players may ask about OSRS (bosses, raids, gear, pets, prices, grind) or anything else; answer helpfully but always through Sol Heredit's voice.
 - Keep answers concise (a few short paragraphs at most) so they fit Discord message limits.`;
 
@@ -47,11 +45,18 @@ Context:
  *
  * Upon script start, this client will:
  * 1. Fetch data that needs to be cached
- * 2. Listen to interaction events (slash commands) and reply to them
+ * 2. Listen to interaction events (slash commands) and @mentions, and reply
  * 3. Log in
+ *
+ * @mentions require GuildMessages + MessageContent intents and the
+ * "Message Content Intent" toggle in the Discord Developer Portal.
  */
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
 });
 
 client.once(Events.ClientReady, async (c) => {
@@ -128,6 +133,30 @@ client.on(Events.InteractionCreate, async (interaction) => {
     await interaction.reply({
       content: `Failed to process command ${interaction.commandName}.`,
       ephemeral: true,
+    });
+  }
+});
+
+client.on(Events.MessageCreate, async (message) => {
+  if (message.author.bot || !client.user) return;
+  if (!message.mentions.has(client.user.id)) return;
+
+  const prompt = stripBotMention(message.content, client.user.id).trim();
+  if (!prompt) {
+    await message.reply("Speak, challenger — what do you want?");
+    return;
+  }
+
+  try {
+    console.log(`Mention chat from ${message.author.tag}: ${prompt}`);
+    await message.channel.sendTyping();
+
+    const reply = await generateSolHereditReply(prompt);
+    await sendChunkedMessageReply(message, reply);
+  } catch (error) {
+    console.log(`mention chat failed with error: ${error}`);
+    await message.reply({
+      content: `Error contacting Ollama: ${error}`,
     });
   }
 });
@@ -637,11 +666,67 @@ async function price(interaction: ChatInputCommandInteraction): Promise<any> {
   );
 }
 
+function stripBotMention(content: string, botUserId: string): string {
+  return content.replace(new RegExp(`<@!?${botUserId}>`, "g"), "");
+}
+
+async function generateSolHereditReply(message: string): Promise<string> {
+  const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
+  const modelName = process.env.OLLAMA_MODEL || "qwen3.6:latest";
+
+  const response = await fetch(`${ollamaUrl}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: modelName,
+      messages: [
+        { role: "system", content: SOL_HEREDIT_SYSTEM_PROMPT },
+        { role: "user", content: message },
+      ],
+      stream: false,
+    }),
+  });
+
+  if (!response.ok) {
+    throw Error(`Ollama API returned ${response.status}`);
+  }
+
+  const data = (await response.json()) as { message?: { content?: string } };
+  return data.message?.content || "No response from Ollama.";
+}
+
+/** Splits content into Discord-safe message parts (≤2000 chars each). */
+function getDiscordMessageParts(content: string, prefix?: string): string[] {
+  const header = prefix ? `${prefix}\n\n` : "";
+  const full = header + content;
+
+  if (full.length <= 2000) {
+    return [full];
+  }
+
+  const codeBlock = `\`\`\n${content}\n\`\`\``;
+  if (header.length + codeBlock.length <= 2000) {
+    return [header + codeBlock];
+  }
+
+  const chunks = splitForDiscord(content, 1950);
+  const firstChunkLimit = Math.max(200, 2000 - header.length);
+  const parts: string[] = [
+    header +
+      chunks[0].slice(0, firstChunkLimit) +
+      (chunks.length > 1 ? "\n\n*(continued…)*" : ""),
+  ];
+  for (let i = 1; i < chunks.length; i++) {
+    const fencePrefix = i === 1 ? "```\n" : "";
+    const fenceSuffix = i === chunks.length - 1 ? "\n```" : "";
+    parts.push(fencePrefix + chunks[i] + fenceSuffix);
+  }
+  return parts;
+}
+
 /**
  * Helper to send a long message in chunks within Discord's 2000 char limit.
  * Uses editReply when the interaction was already acknowledged (e.g. deferReply).
- *
- * @param prefix - Optional text prepended to the first chunk (e.g. the user's question).
  */
 async function sendChunkedReply(
   interaction: ChatInputCommandInteraction,
@@ -649,7 +734,7 @@ async function sendChunkedReply(
   prefix?: string,
 ): Promise<void> {
   const acknowledged = interaction.deferred || interaction.replied;
-  const header = prefix ? `${prefix}\n\n` : "";
+  const parts = getDiscordMessageParts(content, prefix);
 
   const sendFirst = async (text: string): Promise<void> => {
     if (acknowledged) {
@@ -659,34 +744,23 @@ async function sendChunkedReply(
     }
   };
 
-  const sendMore = async (text: string): Promise<void> => {
-    await interaction.followUp({ content: text, ephemeral: false });
-  };
-
-  const full = header + content;
-  if (full.length <= 2000) {
-    await sendFirst(full);
-    return;
+  await sendFirst(parts[0]);
+  for (let i = 1; i < parts.length; i++) {
+    await interaction.followUp({ content: parts[i], ephemeral: false });
   }
+}
 
-  const codeBlock = `\`\`\n${content}\n\`\`\``;
-  if (header.length + codeBlock.length <= 2000) {
-    await sendFirst(header + codeBlock);
-    return;
-  }
+async function sendChunkedMessageReply(
+  message: Message,
+  content: string,
+  prefix?: string,
+): Promise<void> {
+  const parts = getDiscordMessageParts(content, prefix);
+  const firstReply = await message.reply({ content: parts[0] });
+  if (!firstReply.channel.isSendable()) return;
 
-  const chunks = splitForDiscord(content, 1950);
-  const firstChunkLimit = Math.max(200, 2000 - header.length);
-
-  await sendFirst(
-    header +
-      chunks[0].slice(0, firstChunkLimit) +
-      (chunks.length > 1 ? "\n\n*(continued…)*" : ""),
-  );
-  for (let i = 1; i < chunks.length; i++) {
-    const fencePrefix = i === 1 ? "```\n" : "";
-    const fenceSuffix = i === chunks.length - 1 ? "\n```" : "";
-    await sendMore(fencePrefix + chunks[i] + fenceSuffix);
+  for (let i = 1; i < parts.length; i++) {
+    await firstReply.channel.send(parts[i]);
   }
 }
 
@@ -705,18 +779,21 @@ function splitForDiscord(text: string, maxChunkSize: number): string[] {
   return chunks;
 }
 
+function formatDisplayName(
+  user: { globalName?: string | null; username: string },
+  member?: { displayName?: string; nick?: string | null } | null,
+): string {
+  if (member && "displayName" in member && member.displayName) {
+    return member.displayName;
+  }
+  return member?.nick ?? user.globalName ?? user.username;
+}
+
 function formatChatUserMessage(
   interaction: ChatInputCommandInteraction,
   message: string,
 ): string {
-  const member = interaction.member;
-  const name =
-    member && "displayName" in member
-      ? member.displayName
-      : (member?.nick ??
-        interaction.user.globalName ??
-        interaction.user.username);
-  return `**${name}:** ${message}`;
+  return `**${formatDisplayName(interaction.user, interaction.member)}:** ${message}`;
 }
 
 /**
@@ -738,32 +815,9 @@ async function chat(interaction: ChatInputCommandInteraction): Promise<void> {
   await interaction.deferReply();
 
   try {
-    const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
-    const modelName = process.env.OLLAMA_MODEL || "qwen3.6:latest";
-
     console.log(`Sending message to Ollama: ${message}`);
-
-    const response = await fetch(`${ollamaUrl}/api/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: modelName,
-        messages: [
-          { role: "system", content: SOL_HEREDIT_SYSTEM_PROMPT },
-          { role: "user", content: message },
-        ],
-        stream: false,
-      }),
-    });
-
-    if (!response.ok) {
-      throw Error(`Ollama API returned ${response.status}`);
-    }
-
-    const data = (await response.json()) as { message?: { content?: string } };
-    const reply = data.message?.content || "No response from Ollama.";
+    const reply = await generateSolHereditReply(message);
     const userMessage = formatChatUserMessage(interaction, message);
-
     await sendChunkedReply(interaction, reply, userMessage);
   } catch (error) {
     console.log(`chat failed with error: ${error}`);
