@@ -5,12 +5,13 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "commands": "tsx src/bot_commands.ts",
+    "test": "tsx --test 'src/**/*.test.ts'",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
-    "check": "pnpm typecheck && pnpm lint && pnpm format:check"
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test"
   },
   "dependencies": {
     "discord.js": "^14.27.0",

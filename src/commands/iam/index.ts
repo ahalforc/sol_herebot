@@ -3,6 +3,7 @@ import {
   type ChatInputCommandInteraction,
   type SlashCommandOptionsOnlyBuilder,
 } from "discord.js";
+import { setOsrsName } from "../../registry.ts";
 
 export function createCommand(): SlashCommandOptionsOnlyBuilder {
   return new SlashCommandBuilder()
@@ -27,7 +28,7 @@ export async function execute(interaction: ChatInputCommandInteraction): Promise
     throw Error();
   }
 
-  // addIamEntry(discordId, osrsName);
+  setOsrsName(discordId, osrsName);
 
   await interaction.reply(`\`${discordName}\` has been registered as \`${osrsName}\``);
 }
