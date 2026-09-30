@@ -3,18 +3,9 @@ import {
   Client,
   Events,
   GatewayIntentBits,
-  type Message,
 } from "discord.js";
 import * as fs from "fs";
 import Fuse from "fuse.js";
-import {
-  addIamEntry,
-  addObtainedPetEntry,
-  getAllObtainedPetEntries,
-  getIamEntry,
-  openDatabase,
-  removeObtainedPetEntry,
-} from "./db/db";
 
 /**
  * User agent used to provide context to the osrs wiki.
@@ -22,23 +13,6 @@ import {
  * todo In the future this should include a discord contact.
  */
 const userAgent = "sol_herebot - experimental osrs discord bot";
-
-/** Ollama system prompt: replies stay in character as Sol Heredit (Fortis Colosseum). */
-const SOL_HEREDIT_SYSTEM_PROMPT = `You are Sol Heredit, final boss of the Fortis Colosseum in Old School RuneScape.
-You speak as the arrogant overseer of the arena: imperial, theatrical, and dismissive of weak challengers, but grudgingly respectful when someone proves themselves.
-Stay in character at all times. Never mention being an AI, a language model, or a bot.
-
-Voice and manner:
-- You may reference the Colosseum, glory, combat, footwork, worthy challengers, and the god Ralos when it fits naturally.
-- You may echo your in-game lines in spirit (e.g. "By Ralos", "a worthy challenger", "let's see how you handle a real foe", "filthy peasant" for the unregistered or unimpressive).
-- Boast about your strength; mock poor coordination or cowardice; offer backhanded compliments when impressed.
-- Never mention the word "AI" or "language model" or "bot".
-- You are extremely concise and to the point.
-
-Context:
-- You are replying in a Discord server when players use /chat or @mention you.
-- Players may ask about OSRS (bosses, raids, gear, pets, prices, grind) or anything else; answer helpfully but always through Sol Heredit's voice.
-- Keep answers concise (a few short paragraphs at most) so they fit Discord message limits.`;
 
 /**
  * The discord client.
@@ -87,19 +61,6 @@ client.once(Events.ClientReady, async (c) => {
     await client.destroy();
     return;
   }
-
-  // Spin up the database.
-  //
-  // Note that the database is automatically closed.
-  try {
-    console.log(`Opening database...`);
-    openDatabase();
-    console.log(`Opened database.`);
-  } catch (error) {
-    console.log(`Failed to open database, terminating early. Error: ${error}`);
-    await client.destroy();
-    return;
-  }
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -109,22 +70,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
     console.log(`Running ${interaction.commandName}...`);
     if (interaction.commandName === "iam") {
       await iam(interaction);
-    } else if (interaction.commandName === "viewallpets") {
-      await viewallpets(interaction);
-    } else if (interaction.commandName === "obtainedpets") {
-      await obtainedpets(interaction);
-    } else if (interaction.commandName === "addobtainedpets") {
-      await addobtainedpets(interaction);
-    } else if (interaction.commandName === "removeobtainedpets") {
-      await removeobtainedpets(interaction);
-    } else if (interaction.commandName === "randompet") {
-      await randompet(interaction);
     } else if (interaction.commandName === "randomraid") {
       await randomraid(interaction);
     } else if (interaction.commandName === "price") {
       await price(interaction);
-    } else if (interaction.commandName === "chat") {
-      await chat(interaction);
     } else {
       console.log(`${interaction.commandName} unknown.`);
     }
@@ -133,30 +82,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
     await interaction.reply({
       content: `Failed to process command ${interaction.commandName}.`,
       ephemeral: true,
-    });
-  }
-});
-
-client.on(Events.MessageCreate, async (message) => {
-  if (message.author.bot || !client.user) return;
-  if (!message.mentions.has(client.user.id)) return;
-
-  const prompt = stripBotMention(message.content, client.user.id).trim();
-  if (!prompt) {
-    await message.reply("Speak, challenger — what do you want?");
-    return;
-  }
-
-  try {
-    console.log(`Mention chat from ${message.author.tag}: ${prompt}`);
-    await message.channel.sendTyping();
-
-    const reply = await generateSolHereditReply(prompt);
-    await sendChunkedMessageReply(message, reply);
-  } catch (error) {
-    console.log(`mention chat failed with error: ${error}`);
-    await message.reply({
-      content: `Error contacting Ollama: ${error}`,
     });
   }
 });
@@ -306,243 +231,11 @@ async function iam(interaction: ChatInputCommandInteraction): Promise<any> {
     throw Error();
   }
 
-  addIamEntry(discordId, osrsName);
+  // addIamEntry(discordId, osrsName);
 
   await interaction.reply(
     `\`${discordName}\` has been registered as \`${osrsName}\``,
   );
-}
-
-/**
- * slash-command
- *
- * Spews out a response of all pets in osrs
- *
- * /viewallpets
- *
- * @param interaction - the discord interaction for configuration and replying
- */
-async function viewallpets(
-  interaction: ChatInputCommandInteraction,
-): Promise<any> {
-  class Pet {
-    id: number;
-    name: string;
-
-    constructor(id: number, name: string) {
-      this.id = id;
-      this.name = name;
-    }
-  }
-
-  const result = [];
-  for (const [key, value] of pets) {
-    result.push(new Pet(value.id, value.name));
-  }
-  result.sort((a, b) => (a.id < b.id ? -1 : 1));
-
-  const buffer = result.map((r) => `${r.id}: ${r.name}`);
-
-  await interaction.reply({
-    content: "```\n" + buffer.join("\n") + "\n```",
-    ephemeral: true,
-  });
-}
-
-/**
- * slash-command
- *
- * Spews out a response of all pets you have acquired
- *
- * /obtainedpets
- *
- * @param interaction - the discord interaction for configuration and replying
- */
-async function obtainedpets(
-  interaction: ChatInputCommandInteraction,
-): Promise<any> {
-  class Pet {
-    id: number;
-    name: string;
-
-    constructor(id: number, name: string) {
-      this.id = id;
-      this.name = name;
-    }
-  }
-
-  const discordId = interaction.member?.user.id;
-  if (discordId == null) {
-    throw Error();
-  }
-
-  const obtainedPets = new Set<number>();
-  for (const pet of getAllObtainedPetEntries(discordId)) {
-    obtainedPets.add(pet.petId);
-  }
-
-  const result = [];
-  for (const [key, value] of pets) {
-    if (obtainedPets.has(key)) {
-      result.push(new Pet(value.id, value.name));
-    }
-  }
-  result.sort((a, b) => (a.id < b.id ? -1 : 1));
-
-  if (result.length == 0) {
-    await interaction.reply("You have not obtained any pets (that I know of).");
-    return;
-  }
-
-  const buffer = result.map((r) => `${r.id}: ${r.name}`);
-
-  await interaction.reply("```\n" + buffer.join("\n") + "\n```");
-}
-
-/**
- * slash-command
- *
- * Registers your discord user with the given pet ids (comma separated list of ids)
- *
- * (see /viewallpets for the list of pet ids)
- *
- * /addobtainedpets "1, 2, 3, 4, 10, 11, 12, 13"
- *
- * @param interaction - the discord interaction for configuration and replying
- */
-async function addobtainedpets(
-  interaction: ChatInputCommandInteraction,
-): Promise<any> {
-  const discordId = interaction.member?.user.id;
-  if (discordId == null) {
-    throw Error();
-  }
-
-  const petIdsStr = interaction.options.getString("petids");
-  if (petIdsStr == null) {
-    throw Error();
-  }
-
-  const petIds = petIdsStr
-    .replaceAll(" ", "")
-    .split(",")
-    .map((s) => parseInt(s));
-  for (const petId of petIds) {
-    if (pets.has(petId)) {
-      addObtainedPetEntry(discordId, petId);
-    }
-  }
-
-  const osrsName = getIamEntry(discordId)?.osrsName;
-  if (osrsName != null) {
-    await interaction.reply({
-      content: `\`${osrsName}\`, I have recorded these pet entries for you.`,
-      ephemeral: true,
-    });
-  } else {
-    await interaction.reply({
-      content: `I have recorded these pet entries for you.`,
-      ephemeral: true,
-    });
-  }
-}
-
-/**
- * slash-command
- *
- * Un-registers your discord user with the given pet ids (comma separated list of ids)
- *
- * (see /viewallpets for the list of pet ids)
- *
- * /removeobtainedpets "1, 2, 3, 4, 10, 11, 12, 13"
- *
- * @param interaction - the discord interaction for configuration and replying
- */
-async function removeobtainedpets(
-  interaction: ChatInputCommandInteraction,
-): Promise<any> {
-  const discordId = interaction.member?.user.id;
-  if (discordId == null) {
-    throw Error();
-  }
-
-  const petIdsStr = interaction.options.getString("petids");
-  if (petIdsStr == null) {
-    throw Error();
-  }
-
-  const petIds = petIdsStr
-    .replaceAll(" ", "")
-    .split(",")
-    .map((s) => parseInt(s));
-  for (const petId of petIds) {
-    removeObtainedPetEntry(discordId, petId);
-  }
-
-  const osrsName = getIamEntry(discordId)?.osrsName;
-  if (osrsName != null) {
-    await interaction.reply({
-      content: `\`${osrsName}\`, I have un-recorded these pet entries for you.`,
-      ephemeral: true,
-    });
-  } else {
-    await interaction.reply({
-      content: `I have un-recorded these pet entries for you.`,
-      ephemeral: true,
-    });
-  }
-}
-
-/**
- * slash-command
- *
- * Gives you a random pet to hunt for (filters out obtained pets)
- *
- * (see /addobtainedpets for filtering out already-obtained pets)
- *
- * /randompet
- *
- * @param interaction - the discord interaction for configuration and replying
- */
-async function randompet(
-  interaction: ChatInputCommandInteraction,
-): Promise<any> {
-  const discordId = interaction.member?.user.id;
-  if (discordId == null) {
-    throw Error();
-  }
-
-  const obtainedPets = new Set<number>();
-  for (const pet of getAllObtainedPetEntries(discordId)) {
-    obtainedPets.add(pet.petId);
-  }
-
-  const filteredPets = new Array<OsrsPet>();
-  for (const [key, value] of pets) {
-    if (!obtainedPets.has(key)) {
-      filteredPets.push(value);
-    }
-  }
-
-  if (filteredPets.length == 0) {
-    await interaction.reply(
-      `You've already gotten all pets. There's nothing more for you to do.`,
-    );
-    return;
-  }
-
-  const pet = filteredPets[Math.floor(Math.random() * filteredPets.length)];
-
-  const osrsName = getIamEntry(discordId)?.osrsName;
-  if (osrsName != null) {
-    await interaction.reply(
-      `\`${osrsName}\`, hunt ${pet.name}. It has a ${pet.dropRate} drop rate from ${pet.activity}.`,
-    );
-  } else {
-    await interaction.reply(
-      `Hunt ${pet.name}. It has a ${pet.dropRate} drop rate from ${pet.activity}.`,
-    );
-  }
 }
 
 /**
@@ -573,13 +266,7 @@ async function randomraid(
   }
 
   const raid = raids[Math.floor(Math.random() * raids.length)];
-
-  const osrsName = getIamEntry(discordId)?.osrsName;
-  if (osrsName != null) {
-    await interaction.reply(`\`${osrsName}\`, I challenge you to ${raid}!`);
-  } else {
-    await interaction.reply(`Filthy peasant. I challenge you to ${raid}!`);
-  }
+  await interaction.reply(`Filthy peasant. I challenge you to ${raid}!`);
 }
 
 /**
@@ -664,166 +351,4 @@ async function price(interaction: ChatInputCommandInteraction): Promise<any> {
   await interaction.reply(
     `\`${itemName}\` -> \`${actualItemName}\` is roughly ${formattedPrice}gp`,
   );
-}
-
-function stripBotMention(content: string, botUserId: string): string {
-  return content.replace(new RegExp(`<@!?${botUserId}>`, "g"), "");
-}
-
-async function generateSolHereditReply(message: string): Promise<string> {
-  const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
-  const modelName = process.env.OLLAMA_MODEL || "qwen3.6:latest";
-
-  const response = await fetch(`${ollamaUrl}/api/chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: modelName,
-      messages: [
-        { role: "system", content: SOL_HEREDIT_SYSTEM_PROMPT },
-        { role: "user", content: message },
-      ],
-      stream: false,
-    }),
-  });
-
-  if (!response.ok) {
-    throw Error(`Ollama API returned ${response.status}`);
-  }
-
-  const data = (await response.json()) as { message?: { content?: string } };
-  return data.message?.content || "No response from Ollama.";
-}
-
-/** Splits content into Discord-safe message parts (≤2000 chars each). */
-function getDiscordMessageParts(content: string, prefix?: string): string[] {
-  const header = prefix ? `${prefix}\n\n` : "";
-  const full = header + content;
-
-  if (full.length <= 2000) {
-    return [full];
-  }
-
-  const codeBlock = `\`\`\n${content}\n\`\`\``;
-  if (header.length + codeBlock.length <= 2000) {
-    return [header + codeBlock];
-  }
-
-  const chunks = splitForDiscord(content, 1950);
-  const firstChunkLimit = Math.max(200, 2000 - header.length);
-  const parts: string[] = [
-    header +
-      chunks[0].slice(0, firstChunkLimit) +
-      (chunks.length > 1 ? "\n\n*(continued…)*" : ""),
-  ];
-  for (let i = 1; i < chunks.length; i++) {
-    const fencePrefix = i === 1 ? "```\n" : "";
-    const fenceSuffix = i === chunks.length - 1 ? "\n```" : "";
-    parts.push(fencePrefix + chunks[i] + fenceSuffix);
-  }
-  return parts;
-}
-
-/**
- * Helper to send a long message in chunks within Discord's 2000 char limit.
- * Uses editReply when the interaction was already acknowledged (e.g. deferReply).
- */
-async function sendChunkedReply(
-  interaction: ChatInputCommandInteraction,
-  content: string,
-  prefix?: string,
-): Promise<void> {
-  const acknowledged = interaction.deferred || interaction.replied;
-  const parts = getDiscordMessageParts(content, prefix);
-
-  const sendFirst = async (text: string): Promise<void> => {
-    if (acknowledged) {
-      await interaction.editReply({ content: text });
-    } else {
-      await interaction.reply({ content: text, ephemeral: false });
-    }
-  };
-
-  await sendFirst(parts[0]);
-  for (let i = 1; i < parts.length; i++) {
-    await interaction.followUp({ content: parts[i], ephemeral: false });
-  }
-}
-
-async function sendChunkedMessageReply(
-  message: Message,
-  content: string,
-  prefix?: string,
-): Promise<void> {
-  const parts = getDiscordMessageParts(content, prefix);
-  const firstReply = await message.reply({ content: parts[0] });
-  if (!firstReply.channel.isSendable()) return;
-
-  for (let i = 1; i < parts.length; i++) {
-    await firstReply.channel.send(parts[i]);
-  }
-}
-
-function splitForDiscord(text: string, maxChunkSize: number): string[] {
-  const chunks: string[] = [];
-  let remaining = text;
-  while (remaining.length > 0) {
-    let chunk = remaining.slice(0, maxChunkSize);
-    const breakIndex = chunk.lastIndexOf(" ", chunk.length - 50);
-    if (breakIndex > 500) {
-      chunk = chunk.slice(0, breakIndex);
-    }
-    chunks.push(chunk);
-    remaining = remaining.slice(chunk.length).trimStart();
-  }
-  return chunks;
-}
-
-function formatDisplayName(
-  user: { globalName?: string | null; username: string },
-  member?: { displayName?: string; nick?: string | null } | null,
-): string {
-  if (member && "displayName" in member && member.displayName) {
-    return member.displayName;
-  }
-  return member?.nick ?? user.globalName ?? user.username;
-}
-
-function formatChatUserMessage(
-  interaction: ChatInputCommandInteraction,
-  message: string,
-): string {
-  return `**${formatDisplayName(interaction.user, interaction.member)}:** ${message}`;
-}
-
-/**
- * slash-command
- *
- * Chat with Sol Heredit (Qwen via local Ollama)
- *
- * /chat "hello how are you"
- *
- * @param interaction - the discord interaction for configuration and replying
- */
-async function chat(interaction: ChatInputCommandInteraction): Promise<void> {
-  const message = interaction.options.getString("message");
-
-  if (message == null) {
-    throw Error();
-  }
-
-  await interaction.deferReply();
-
-  try {
-    console.log(`Sending message to Ollama: ${message}`);
-    const reply = await generateSolHereditReply(message);
-    const userMessage = formatChatUserMessage(interaction, message);
-    await sendChunkedReply(interaction, reply, userMessage);
-  } catch (error) {
-    console.log(`chat failed with error: ${error}`);
-    const userMessage = formatChatUserMessage(interaction, message);
-    await interaction.editReply({
-      content: `${userMessage}\n\nError contacting Ollama: ${error}`,
-    });
-  }
 }

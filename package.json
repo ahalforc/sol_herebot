@@ -1,16 +1,29 @@
 {
   "name": "sol_herebot",
-  "module": "index.ts",
   "type": "module",
-  "devDependencies": {
-    "@types/bun": "^1.3.14"
+  "private": true,
+  "packageManager": "pnpm@12.8.1+sha512.f64ba907507f5ceafe06c8d38e6052d0179444580ec1279ddd5bfc11cb48aa8a2644b66598e07e761da84872a9fc57d5f902b87fa49d024198d558612aabbe45",
+  "engines": {
+    "node": ">=22.0.0"
   },
-  "peerDependencies": {
-    "typescript": "^6.0.2"
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "commands": "tsx src/bot_commands.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check ."
   },
   "dependencies": {
-    "discord.js": "^14.26.4",
-    "fuse.js": "^7.3.0",
-    "node-fetch": "^3.3.2"
+    "discord.js": "^14.27.0",
+    "fuse.js": "^7.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.0",
+    "oxfmt": "^0.19.0",
+    "oxlint": "^1.86.0",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3"
   }
 }
