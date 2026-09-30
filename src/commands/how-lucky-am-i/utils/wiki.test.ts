@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { buildDropTable, parseRarity, type DropRow } from "./wiki.ts";
+import {
+  buildDropsQuery,
+  buildDropTable,
+  parseBucketResponse,
+  parseRarity,
+  type DropRow,
+} from "./wiki.ts";
 
 function assertClose(actual: number | undefined, expected: number): void {
   assert.ok(actual != null, "expected a number");
@@ -69,4 +75,61 @@ test("buildDropTable keys items by lowercased name", () => {
 test("buildDropTable skips rows it cannot parse", () => {
   const table = buildDropTable([row({ itemName: "Mystery", rarity: "Varies" })]);
   assert.equal(table.has("mystery"), false);
+});
+
+test("buildDropsQuery ORs every page and escapes quotes", () => {
+  assert.equal(
+    buildDropsQuery(["Vorkath", "Kree'arra"]),
+    "bucket('dropsline').select('page_name','item_name','drop_json')" +
+      ".where(bucket.Or({'page_name','Vorkath'},{'page_name','Kree\\'arra'})).limit(5000).run()",
+  );
+});
+
+test("parseBucketResponse groups rows by page and fills defaults", () => {
+  const rows = parseBucketResponse(["Vorkath", "Zulrah", "Obor"], {
+    bucket: [
+      {
+        page_name: "Vorkath",
+        item_name: "Vorki",
+        drop_json: JSON.stringify({
+          Rarity: "1/3,000",
+          Rolls: 1,
+          "Quantity Low": 1,
+          "Quantity High": 1,
+          "Dropped from": "Vorkath#Post-quest",
+        }),
+      },
+      {
+        page_name: "Zulrah",
+        item_name: "Tanzanite fang",
+        drop_json: JSON.stringify({ Rarity: "1/1,024", "Dropped from": "Zulrah" }),
+      },
+    ],
+  });
+
+  assert.deepEqual(rows.get("Vorkath"), [
+    {
+      itemName: "Vorki",
+      rarity: "1/3,000",
+      rolls: 1,
+      quantityLow: 1,
+      quantityHigh: 1,
+      droppedFrom: "Vorkath#Post-quest",
+    },
+  ]);
+  assert.deepEqual(rows.get("Zulrah"), [
+    {
+      itemName: "Tanzanite fang",
+      rarity: "1/1,024",
+      rolls: 1,
+      quantityLow: 1,
+      quantityHigh: 1,
+      droppedFrom: "Zulrah",
+    },
+  ]);
+  assert.deepEqual(rows.get("Obor"), []);
+});
+
+test("parseBucketResponse throws when the query failed", () => {
+  assert.throws(() => parseBucketResponse(["Vorkath"], { error: "bad query" }));
 });
