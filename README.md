@@ -55,4 +55,20 @@ pnpm lint
 pnpm format
 ```
 
-Or use the Makefile targets `make run` and `make commands`.
+## Docker
+
+Run the bot in the background so it stays up after you close the terminal.
+
+Compose does not read `~/.zshrc`. It copies variables that are already exported in the terminal where you run `make`. `DISCORD_TOKEN` and `DISCORD_CLIENT_ID` need `export` in your shell. After you change them, run `make up` again so the container is recreated.
+
+```bash
+make up
+make logs
+make down
+```
+
+Register slash commands once from that same shell:
+
+```bash
+make commands
+```

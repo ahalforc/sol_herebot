@@ -1,7 +1,13 @@
-run:
-	pnpm start
+up:
+	docker compose up -d --build
+
+logs:
+	docker compose logs -f
+
+down:
+	docker compose down
 
 commands:
-	pnpm commands
+	docker compose run --rm bot pnpm commands
 
-.PHONY: run commands
+.PHONY: up logs down commands

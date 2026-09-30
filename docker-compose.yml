@@ -1,0 +1,7 @@
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    environment:
+      DISCORD_TOKEN: ${DISCORD_TOKEN:?export DISCORD_TOKEN in your shell, then rerun docker compose}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:?export DISCORD_CLIENT_ID in your shell, then rerun docker compose}
