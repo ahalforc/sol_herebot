@@ -33,6 +33,7 @@ src/
       index.ts
       utils/
         bosses.ts
+        http.ts
         temple.ts
         wiki.ts
         luck.ts
@@ -42,7 +43,9 @@ src/
 - `src/registry.ts`: in-memory `Map<discordId, osrsName>` with `setOsrsName(discordId, osrsName)` and `getOsrsName(discordId)`. It lives at the top level because two commands use it (repo rule: shared helpers do not belong in a command slice).
 - `src/commands/iam/index.ts`: calls `setOsrsName` instead of the commented-out `addIamEntry`.
 - `how-lucky-am-i/index.ts`: `createCommand` and `execute`, plus the autocomplete handler for the `boss` option. It defers the reply, resolves the player, and dispatches to the summary or boss view.
-- `utils/bosses.ts`: hand-written list of supported bosses. Each entry has the Temple boss name (e.g. `"KreeArra"`), the Temple collection log category key (e.g. `"kreearra"`), the wiki page name (e.g. `"Kree'arra"`), a display name, and optional `overrides` (item name → per-kill rate) and `exclude` (item names treated as trivial).
+- `utils/bosses.ts`: hand-written list of supported bosses, one entry per Temple collection log category. Each entry has a display name, the category key (e.g. `"kree_arra"`), one or more sources, and optional `overrides` (item name → per-kill probability) and `exclude` (item names treated as trivial). A source is a Temple boss name (e.g. `"KreeArra"`), a wiki page (e.g. `"Kree'arra"`), and an optional `droppedFrom` filter for pages that hold several variants (e.g. `"Reward Chest (The Gauntlet)#Corrupted"`). Categories with several sources: `dagannoth_kings` (Prime, Rex, Supreme), `callisto_and_artio`, `venenatis_and_spindel`, `vetion_and_calvarion`, `the_gauntlet` (regular and Corrupted), `the_nightmare` (Nightmare and Phosani's).
+- Not supported in v1: Royal Titans (its uniques are not in the wiki drop table), Barrows (chest rolls depend on brothers killed), Moons of Peril and Fortis Colosseum (minigame-style rewards).
+- `utils/http.ts`: shared user agent and JSON fetch for Temple and the wiki.
 - `utils/temple.ts`: typed fetchers for the three Temple endpoints.
 - `utils/wiki.ts`: batched `dropsline` fetch for a list of wiki pages, the in-memory cache, and rarity parsing.
 - `utils/luck.ts`: pure math, with no network or Discord code.
@@ -58,22 +61,25 @@ src/
 
 ## Rarity parsing (`wiki.ts`)
 
-- `"a/b"` (commas allowed, e.g. `"1/5,000"`) → `a / b` per roll.
+- `"a/b"` (commas and decimals allowed, e.g. `"1/5,000"`, `"43.7/127"`, `"1/94.93"`) → `a / b` per roll.
 - `"Always"` → `1`.
-- Per-kill probability: `p = 1 - (1 - p_roll)^rolls`, where `rolls` comes from `drop_json.Rolls` (default 1).
-- Average quantity `q = (Quantity Low + Quantity High) / 2`.
-- If one item has several `dropsline` rows on the same page, their per-kill probabilities are combined as `1 - Π(1 - p_row)` and `q` is taken from the most likely row.
-- Anything else (e.g. text with notes, conditional rates) is unparseable. A `bosses.ts` override takes precedence; without one, the item is "rate unknown".
+- Each row contributes `rolls × p_roll × q` to the item's expected quantity per kill, with `q = (Quantity Low + Quantity High) / 2` and `rolls` from `drop_json.Rolls` (default 1).
+- Each row contributes `(1 - p_roll)^rolls` to the chance of not getting the item on a kill. The item's per-kill probability is `1 - Π rows (1 - p_roll)^rolls`.
+- Rows are matched to log items by case-insensitive item name.
+- Anything else (e.g. text with notes, conditional rates) is unparseable and the row is ignored. A `bosses.ts` override (a per-kill probability with quantity 1) takes precedence; with no usable row and no override, the item is "rate unknown".
 
 ## Luck math (`luck.ts`)
 
-Per item, with kill count `KC`, per-kill probability `p`, average quantity `q`, and kills per hour `kph`:
+Per item, summing over the entry's sources `s` with kill count `KC_s`, expected quantity per kill `e_s`, per-kill probability `p_s`, and kills per hour `kph_s`:
 
-- Expected count: `E = KC × p × q`.
+- Total kills: `KC = Σ KC_s`. Sources with `KC_s = 0` are ignored.
+- Expected count: `E = Σ KC_s × e_s`.
 - Item ratio: `actual / E`.
-- Hours spent at boss: `KC / kph`.
-- Hours the item's drops are worth: `actual / (p × q × kph)`. Item ratio equals hours worth ÷ hours spent.
+- Hours spent at boss: `H = Σ KC_s / kph_s`.
+- Hours the item's drops are worth: `ratio × H`.
+- The player's kill mix gives an effective per-kill probability `p = Σ KC_s × p_s / KC` and effective kills per hour `kph = KC / H`.
 - Average hours to obtain a missing item: `1 / (p × kph)`.
+- If any source with kills has no rate for the item, the item is "rate unknown".
 
 An item is excluded from the math and marked trivial if `actual ≥ 256`, `E ≥ 256`, or it is in the boss's `exclude` list. Items with unknown rates are also excluded. Excluded items are still listed in the boss view.
 
@@ -81,8 +87,8 @@ Per boss:
 
 - Boss ratio: arithmetic mean of included item ratios. Rare hits are intentionally allowed to dominate.
 - Lucky hours: `(boss ratio − 1) × hours spent`.
-- Expected kills to finish the log: `∫₀^∞ (1 − Π_i (1 − e^(−p_i t))) dt`, integrated numerically over the included items. Reported from zero (all items) and remaining (only items with `actual = 0`), converted to hours by dividing by `kph`.
-- If `kph` is `0` (e.g. Bryophyta, Obor, Hespori), count ratios are shown and all hours values are omitted.
+- Expected kills to finish the log: `∫₀^∞ (1 − Π_i (1 − e^(−p_i t))) dt` with each item's effective `p`, integrated numerically over the included items. Reported from zero (all items) and remaining (only items with `actual = 0`), converted to hours by dividing by `kph`.
+- If any source with kills has `kph_s = 0` or no Temple rate (e.g. Bryophyta, Obor, Hespori), count ratios are shown and all hours values are omitted.
 
 Account-wide:
 
