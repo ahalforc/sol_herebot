@@ -1,13 +1,26 @@
-import { Client, Events, GatewayIntentBits, type ChatInputCommandInteraction } from "discord.js";
+import {
+  Client,
+  Events,
+  GatewayIntentBits,
+  type AutocompleteInteraction,
+  type ChatInputCommandInteraction,
+} from "discord.js";
 import * as fs from "fs";
 import { execute as iam } from "./commands/iam/index.ts";
 import { execute as price, loadAllItems } from "./commands/price/index.ts";
 import { execute as randomraid } from "./commands/randomraid/index.ts";
+import { autocomplete as howLuckyAmIAutocomplete } from "./commands/how-lucky-am-i/index.ts";
+import { execute as howLuckyAmI } from "./commands/how-lucky-am-i/index.ts";
 
 const executors: Record<string, (interaction: ChatInputCommandInteraction) => Promise<void>> = {
   iam,
   randomraid,
   price,
+  "how-lucky-am-i": howLuckyAmI,
+};
+
+const autocompleters: Record<string, (interaction: AutocompleteInteraction) => Promise<void>> = {
+  "how-lucky-am-i": howLuckyAmIAutocomplete,
 };
 
 /**
@@ -27,6 +40,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
+  allowedMentions: { parse: [] },
 });
 
 client.once(Events.ClientReady, async (c) => {
@@ -56,6 +70,15 @@ client.once(Events.ClientReady, async (c) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
+  if (interaction.isAutocomplete()) {
+    try {
+      await autocompleters[interaction.commandName]?.(interaction);
+    } catch (error) {
+      console.log(`${interaction.commandName} autocomplete failed with error ${error}.`);
+    }
+    return;
+  }
+
   if (!interaction.isChatInputCommand()) return;
 
   try {
@@ -68,10 +91,16 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
   } catch (error) {
     console.log(`${interaction.commandName} failed with error ${error}.`);
-    await interaction.reply({
-      content: `Failed to process command ${interaction.commandName}.`,
-      ephemeral: true,
-    });
+    const content = `Failed to process command ${interaction.commandName}.`;
+    try {
+      if (interaction.deferred || interaction.replied) {
+        await interaction.editReply(content);
+      } else {
+        await interaction.reply({ content, ephemeral: true });
+      }
+    } catch (replyError) {
+      console.log(`Failed to report error for ${interaction.commandName}: ${replyError}`);
+    }
   }
 });
 
