@@ -8,6 +8,11 @@ Sol Herebot is the champion of OSRS Discord Bots!
 > This is very much a work in progress, and I'm only working on this in my free time.
 > If you have any feature requests, feel free to open an issue.
 
+## Requirements
+
+- [Node.js](https://nodejs.org/) 22 or newer
+- [pnpm](https://pnpm.io/) 12 (via [Corepack](https://nodejs.org/api/corepack.html): `corepack enable`)
+
 ## Commands
 
 Here are all of the supported commands:
@@ -22,26 +27,32 @@ Here are all of the supported commands:
 
 This bot is only possible due to the generosity of the OSRS team and the OSRS wiki team.
 
-## Tech stack
+## Development
 
-### Bun
-
-This project was created with `bun` via `bun init` v1.1.29. See [Bun](https://bun.sh) for details.
-
-To install dependencies:
+Install dependencies:
 
 ```bash
-bun install
+pnpm install
 ```
 
-To run:
+Register slash commands with Discord (requires `DISCORD_TOKEN` and `DISCORD_CLIENT_ID`):
 
 ```bash
-bun run bot.ts
+pnpm commands
 ```
 
-To upgrade Bun:
+Run the bot:
 
 ```bash
-bun upgrade
+pnpm start
 ```
+
+Typecheck, lint, and format:
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm format
+```
+
+Or use the Makefile targets `make run` and `make commands`.

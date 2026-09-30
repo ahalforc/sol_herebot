@@ -13,10 +13,7 @@ const commands = [
     .setName("iam")
     .setDescription("Registers your discord user with the given osrs user")
     .addStringOption((option) =>
-      option
-        .setName("osrsuser")
-        .setDescription("What is your osrs username?")
-        .setRequired(true),
+      option.setName("osrsuser").setDescription("What is your osrs username?").setRequired(true),
     )
     .toJSON(),
   new SlashCommandBuilder()
@@ -27,10 +24,7 @@ const commands = [
     .setName("price")
     .setDescription("Returns the current estimated price of an item")
     .addStringOption((option) =>
-      option
-        .setName("itemname")
-        .setDescription("What is the item name?")
-        .setRequired(true),
+      option.setName("itemname").setDescription("What is the item name?").setRequired(true),
     )
     .toJSON(),
 ];

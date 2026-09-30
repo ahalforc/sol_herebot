@@ -1,5 +1,7 @@
 run:
-	bun run src/index.ts
+	pnpm start
 
 commands:
-	bun run src/bot_commands.ts
+	pnpm commands
+
+.PHONY: run commands

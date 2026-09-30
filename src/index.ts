@@ -1,9 +1,4 @@
-import {
-  ChatInputCommandInteraction,
-  Client,
-  Events,
-  GatewayIntentBits,
-} from "discord.js";
+import { ChatInputCommandInteraction, Client, Events, GatewayIntentBits } from "discord.js";
 import * as fs from "fs";
 import Fuse from "fuse.js";
 
@@ -42,9 +37,7 @@ client.once(Events.ClientReady, async (c) => {
     await loadAllItems();
     console.log(`Fetched all items.`);
   } catch (error) {
-    console.log(
-      `Failed to fetch all items, terminating early. Error: ${error}`,
-    );
+    console.log(`Failed to fetch all items, terminating early. Error: ${error}`);
     await client.destroy();
     return;
   }
@@ -55,9 +48,7 @@ client.once(Events.ClientReady, async (c) => {
     loadAllDataFiles();
     console.log(`Opened data files.`);
   } catch (error) {
-    console.log(
-      `Failed to open data files, terminating early. Error: ${error}`,
-    );
+    console.log(`Failed to open data files, terminating early. Error: ${error}`);
     await client.destroy();
     return;
   }
@@ -119,13 +110,7 @@ class OsrsPet {
   dropRate: string;
   releaseDate: string;
 
-  constructor(
-    id: number,
-    name: string,
-    activity: string,
-    dropRate: string,
-    releaseDate: string,
-  ) {
+  constructor(id: number, name: string, activity: string, dropRate: string, releaseDate: string) {
     this.id = id;
     this.name = name;
     this.activity = activity;
@@ -148,22 +133,11 @@ async function loadAllItems(): Promise<any> {
     }
   }
 
-  class Response {
-    items: Array<ResponseItem>;
-
-    constructor(items: Array<ResponseItem>) {
-      this.items = items;
-    }
-  }
-
-  const response = await fetch(
-    `https://prices.runescape.wiki/api/v1/osrs/mapping`,
-    {
-      headers: {
-        "User-Agent": userAgent,
-      },
+  const response = await fetch(`https://prices.runescape.wiki/api/v1/osrs/mapping`, {
+    headers: {
+      "User-Agent": userAgent,
     },
-  );
+  });
 
   for (const item of (await response.json()) as ResponseItem[]) {
     items.set(item.id, new OsrsItem(item.id, item.name));
@@ -233,9 +207,7 @@ async function iam(interaction: ChatInputCommandInteraction): Promise<any> {
 
   // addIamEntry(discordId, osrsName);
 
-  await interaction.reply(
-    `\`${discordName}\` has been registered as \`${osrsName}\``,
-  );
+  await interaction.reply(`\`${discordName}\` has been registered as \`${osrsName}\``);
 }
 
 /**
@@ -247,9 +219,7 @@ async function iam(interaction: ChatInputCommandInteraction): Promise<any> {
  *
  * @param interaction - the discord interaction for configuration and replying
  */
-async function randomraid(
-  interaction: ChatInputCommandInteraction,
-): Promise<any> {
+async function randomraid(interaction: ChatInputCommandInteraction): Promise<any> {
   const raids = [
     "Chambers of Xeric (Regular)",
     "Chambers of Xeric (Challenge Mode)",
@@ -336,8 +306,8 @@ async function price(interaction: ChatInputCommandInteraction): Promise<any> {
     }
   }
 
-  const data = ((await response.json()) as TimeSeriesResponse).data.sort(
-    (a, b) => (a.timestamp > b.timestamp ? -1 : 1),
+  const data = ((await response.json()) as TimeSeriesResponse).data.sort((a, b) =>
+    a.timestamp > b.timestamp ? -1 : 1,
   );
 
   const price = data.find((entry) => entry.avgHighPrice != null)?.avgHighPrice;
