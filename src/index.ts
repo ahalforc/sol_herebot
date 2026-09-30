@@ -40,6 +40,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
+  allowedMentions: { parse: [] },
 });
 
 client.once(Events.ClientReady, async (c) => {
@@ -91,10 +92,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
   } catch (error) {
     console.log(`${interaction.commandName} failed with error ${error}.`);
     const content = `Failed to process command ${interaction.commandName}.`;
-    if (interaction.deferred || interaction.replied) {
-      await interaction.editReply(content);
-    } else {
-      await interaction.reply({ content, ephemeral: true });
+    try {
+      if (interaction.deferred || interaction.replied) {
+        await interaction.editReply(content);
+      } else {
+        await interaction.reply({ content, ephemeral: true });
+      }
+    } catch (replyError) {
+      console.log(`Failed to report error for ${interaction.commandName}: ${replyError}`);
     }
   }
 });

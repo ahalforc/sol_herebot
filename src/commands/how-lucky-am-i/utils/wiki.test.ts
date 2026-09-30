@@ -42,6 +42,8 @@ test("parseRarity rejects text it cannot parse", () => {
   assert.equal(parseRarity("Unknown"), undefined);
   assert.equal(parseRarity(""), undefined);
   assert.equal(parseRarity("1/0"), undefined);
+  assert.equal(parseRarity("0/100"), undefined);
+  assert.equal(parseRarity(",/100"), undefined);
 });
 
 test("buildDropTable accounts for multiple rolls", () => {

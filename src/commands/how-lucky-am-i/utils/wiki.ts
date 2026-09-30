@@ -40,7 +40,12 @@ export function parseRarity(rarity: string): number | undefined {
 
   const numerator = Number(match[1].replaceAll(",", ""));
   const denominator = Number(match[2].replaceAll(",", ""));
-  if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator <= 0) {
+  if (
+    !Number.isFinite(numerator) ||
+    !Number.isFinite(denominator) ||
+    numerator <= 0 ||
+    denominator <= 0
+  ) {
     return undefined;
   }
 
@@ -162,6 +167,9 @@ export async function getDropRows(pages: string[]): Promise<Map<string, DropRow[
       try {
         for (const [page, rows] of await fetchDropRows(chunk)) {
           cachedRows.set(page, rows);
+          if (rows.length === 0) {
+            console.log(`No wiki drops found for ${page}.`);
+          }
         }
       } catch (error) {
         console.log(`Failed to fetch wiki drops for ${chunk.join(", ")}. Error: ${error}`);

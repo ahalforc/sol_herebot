@@ -25,7 +25,8 @@ export function createCommand(): SlashCommandOptionsOnlyBuilder {
     .addStringOption((option) =>
       option
         .setName("username")
-        .setDescription("What is your osrs username? Defaults to your /iam name"),
+        .setDescription("What is your osrs username? Defaults to your /iam name")
+        .setMaxLength(12),
     )
     .addStringOption((option) =>
       option.setName("boss").setDescription("Show a single boss").setAutocomplete(true),
