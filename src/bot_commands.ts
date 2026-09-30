@@ -1,4 +1,7 @@
-import { REST, Routes, SlashCommandBuilder } from "discord.js";
+import { REST, Routes } from "discord.js";
+import { createCommand as createIamCommand } from "./commands/iam/index.ts";
+import { createCommand as createPriceCommand } from "./commands/price/index.ts";
+import { createCommand as createRandomraidCommand } from "./commands/randomraid/index.ts";
 
 /**
  * The source-of-truth list of commands that this bot supports.
@@ -6,27 +9,11 @@ import { REST, Routes, SlashCommandBuilder } from "discord.js";
  * Idea: /loadout "araxxor" -> uses your /iam registered osrs user to compute best loadout
  * Idea: /hiscores "araxxor" -> uses your /iam registered osrs user to do a hiscore lookup
  * Idea: /randompvp "options as plain text?" -> generates a random pvp challenge
- *
  */
 const commands = [
-  new SlashCommandBuilder()
-    .setName("iam")
-    .setDescription("Registers your discord user with the given osrs user")
-    .addStringOption((option) =>
-      option.setName("osrsuser").setDescription("What is your osrs username?").setRequired(true),
-    )
-    .toJSON(),
-  new SlashCommandBuilder()
-    .setName("randomraid")
-    .setDescription("Gives you a random raid (or group boss)")
-    .toJSON(),
-  new SlashCommandBuilder()
-    .setName("price")
-    .setDescription("Returns the current estimated price of an item")
-    .addStringOption((option) =>
-      option.setName("itemname").setDescription("What is the item name?").setRequired(true),
-    )
-    .toJSON(),
+  createIamCommand().toJSON(),
+  createRandomraidCommand().toJSON(),
+  createPriceCommand().toJSON(),
 ];
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);

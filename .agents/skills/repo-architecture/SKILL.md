@@ -55,7 +55,7 @@ Imports use the `.ts` extension (`verbatimModuleSyntax` and `allowImportingTsExt
 
 Put helpers used only by this command in `utils/`. Import them from this command's `index.ts`.
 
-Do not import another command's `utils/`. If a helper is used by more than one command, it does not belong in a command slice. Shared persistence stays in `src/db`.
+Do not import another command's `utils/`. If a helper is used by more than one command, it does not belong in a command slice.
 
 Do not add an empty `utils/` directory or a placeholder file. Add files there when the command has helpers.
 
