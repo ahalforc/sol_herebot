@@ -147,6 +147,41 @@ test("analyzeBoss mixes sources by kills and ignores sources without kills", () 
   assertClose(result.items[0].hoursToObtain, 2.5);
 });
 
+const pair: BossEntry = {
+  name: "Pair",
+  category: "pair",
+  sources: [
+    { templeBoss: "A", wikiPage: "A" },
+    { templeBoss: "B", wikiPage: "B" },
+  ],
+};
+
+test("analyzeBoss counts items that only some sources drop", () => {
+  const result = analyzeBoss(
+    pair,
+    [{ id: 1, name: "Seers ring", count: 1 }],
+    [
+      { kills: 200, killsPerHour: 50, table: table({ "Seers ring": 1 / 128 }) },
+      { kills: 300, killsPerHour: 50, table: table({ "Berserker ring": 1 / 128 }) },
+    ],
+  );
+  assert.equal(result.items[0].status, "counted");
+  assertClose(result.items[0].expected, 200 / 128);
+  assertClose(result.items[0].probability, (200 * (1 / 128)) / 500);
+});
+
+test("analyzeBoss marks items unknown when an active source's wiki fetch failed", () => {
+  const result = analyzeBoss(
+    pair,
+    [{ id: 1, name: "Seers ring", count: 1 }],
+    [
+      { kills: 200, killsPerHour: 50, table: table({ "Seers ring": 1 / 128 }) },
+      { kills: 300, killsPerHour: 50, table: undefined },
+    ],
+  );
+  assert.equal(result.items[0].status, "unknown");
+});
+
 test("analyzeBoss marks every item unknown when the wiki fetch failed", () => {
   const result = analyzeBoss(
     vorkath,

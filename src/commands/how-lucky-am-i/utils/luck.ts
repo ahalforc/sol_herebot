@@ -103,14 +103,20 @@ export function analyzeBoss(
 
   const items = clogItems.map((item): ItemResult => {
     const base = { name: item.name, actual: item.count };
-    const rates = active.map((source) => rateFor(entry, item.name, source.table));
-    if (kills === 0 || rates.some((rate) => rate == null)) {
+    const rates: ItemRate[] = [];
+    for (const source of active) {
+      const rate = rateFor(entry, item.name, source.table);
+      if (rate == null && source.table == null) {
+        return { ...base, status: "unknown" };
+      }
+      rates.push(rate ?? { probability: 0, expectedPerKill: 0 });
+    }
+    if (kills === 0) {
       return { ...base, status: "unknown" };
     }
 
-    const known = rates as ItemRate[];
     const expected = active.reduce(
-      (sum, source, i) => sum + source.kills * known[i].expectedPerKill,
+      (sum, source, i) => sum + source.kills * rates[i].expectedPerKill,
       0,
     );
     if (expected <= 0) {
@@ -125,7 +131,7 @@ export function analyzeBoss(
     }
 
     const probability =
-      active.reduce((sum, source, i) => sum + source.kills * known[i].probability, 0) / kills;
+      active.reduce((sum, source, i) => sum + source.kills * rates[i].probability, 0) / kills;
     const ratio = item.count / expected;
     return {
       ...base,

@@ -27,6 +27,19 @@ test("combined categories list every Temple boss", () => {
   );
 });
 
+test("pages with several drop tables pick one by Dropped from", () => {
+  for (const [name, droppedFrom] of [
+    ["Yama", "Yama"],
+    ["Scurrius", "Scurrius#MVP"],
+    ["Maggot King", "Maggot King"],
+  ]) {
+    assert.deepEqual(
+      findBoss(name)?.sources.map((source) => source.droppedFrom),
+      [droppedFrom],
+    );
+  }
+});
+
 test("searchBosses filters by substring and caps at 25", () => {
   assert.deepEqual(
     searchBosses("dagannoth").map((boss) => boss.name),

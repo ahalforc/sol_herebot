@@ -105,7 +105,11 @@ export const bosses: BossEntry[] = [
   single("K'ril Tsutsaroth", "kril_tsutsaroth", "Kril Tsutsaroth", "K'ril Tsutsaroth"),
   single("The Leviathan", "the_leviathan", "The Leviathan", "The Leviathan"),
   single("The Mad Angel", "the_mad_angel", "Mad Angel", "Mad Angel"),
-  single("Maggot King", "maggot_king", "Maggot King", "Maggot King"),
+  {
+    name: "Maggot King",
+    category: "maggot_king",
+    sources: [{ templeBoss: "Maggot King", wikiPage: "Maggot King", droppedFrom: "Maggot King" }],
+  },
   single("Nex", "nex", "Nex", "Nex"),
   {
     name: "The Nightmare",
@@ -119,7 +123,11 @@ export const bosses: BossEntry[] = [
   single("Phantom Muspah", "phantom_muspah", "Phantom Muspah", "Phantom Muspah"),
   single("Sarachnis", "sarachnis", "Sarachnis", "Sarachnis"),
   single("Scorpia", "scorpia", "Scorpia", "Scorpia"),
-  single("Scurrius", "scurrius", "Scurrius", "Scurrius"),
+  {
+    name: "Scurrius",
+    category: "scurrius",
+    sources: [{ templeBoss: "Scurrius", wikiPage: "Scurrius", droppedFrom: "Scurrius#MVP" }],
+  },
   single("Shellbane Gryphon", "shellbane_gryphon", "Shellbane Gryphon", "Shellbane gryphon"),
   single("Skotizo", "skotizo", "Skotizo", "Skotizo"),
   single(
@@ -147,7 +155,11 @@ export const bosses: BossEntry[] = [
   },
   single("Vorkath", "vorkath", "Vorkath", "Vorkath"),
   single("The Whisperer", "the_whisperer", "The Whisperer", "The Whisperer"),
-  single("Yama", "yama", "Yama", "Yama"),
+  {
+    name: "Yama",
+    category: "yama",
+    sources: [{ templeBoss: "Yama", wikiPage: "Yama", droppedFrom: "Yama" }],
+  },
   single("Zulrah", "zulrah", "Zulrah", "Zulrah"),
 ];
 
