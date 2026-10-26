@@ -23,6 +23,8 @@ Here are all of the supported commands:
 
 `/price` - returns the current price for the item that best matches the provided name
 
+`/prices-bulk` - returns the current prices of the tradeable uniques from a raid (`tfa`, `toa`, `tob` or `cox`), most expensive first
+
 `/how-lucky-am-i` - compares your boss collection log (from TempleOSRS) against osrs wiki drop rates, as a luck ratio and in hours. Takes an optional `username` (defaults to your `/iam` name) and an optional `boss` for a per-item breakdown
 
 ## API integrations
@@ -37,7 +39,7 @@ Install dependencies:
 pnpm install
 ```
 
-Register slash commands with Discord (requires `DISCORD_TOKEN` and `DISCORD_CLIENT_ID`):
+Register slash commands with Discord (requires `SOL_HEREBOT_DISCORD_TOKEN` and `SOL_HEREBOT_DISCORD_CLIENT_ID`):
 
 ```bash
 pnpm commands
@@ -61,7 +63,7 @@ pnpm format
 
 Run the bot in the background so it stays up after you close the terminal.
 
-Compose does not read `~/.zshrc`. It copies variables that are already exported in the terminal where you run `make`. `DISCORD_TOKEN` and `DISCORD_CLIENT_ID` need `export` in your shell. After you change them, run `make up` again so the container is recreated.
+Compose does not read `~/.zshrc`. It copies variables that are already exported in the terminal where you run `make`. `SOL_HEREBOT_DISCORD_TOKEN` and `SOL_HEREBOT_DISCORD_CLIENT_ID` need `export` in your shell. After you change them, run `make up` again so the container is recreated.
 
 ```bash
 make up
