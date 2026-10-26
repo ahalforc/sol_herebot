@@ -2,6 +2,7 @@ import { REST, Routes } from "discord.js";
 import { createCommand as createIamCommand } from "./commands/iam/index.ts";
 import { createCommand as createPriceCommand } from "./commands/price/index.ts";
 import { createCommand as createRandomraidCommand } from "./commands/randomraid/index.ts";
+import { createCommand as createPricesBulkCommand } from "./commands/prices-bulk/index.ts";
 import { createCommand as createHowLuckyAmICommand } from "./commands/how-lucky-am-i/index.ts";
 
 /**
@@ -15,6 +16,7 @@ const commands = [
   createIamCommand().toJSON(),
   createRandomraidCommand().toJSON(),
   createPriceCommand().toJSON(),
+  createPricesBulkCommand().toJSON(),
   createHowLuckyAmICommand().toJSON(),
 ];
 
