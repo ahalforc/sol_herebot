@@ -1,4 +1,5 @@
 import { getJson } from "./http.ts";
+import type { Unique } from "./sources.ts";
 
 const pricesApi = "https://prices.runescape.wiki/api/v1/osrs";
 
@@ -10,6 +11,7 @@ const latestTtlMs = 60_000;
 export type PricedItem = {
   name: string;
   price: number;
+  weight: number;
 };
 
 export type PriceList = {
@@ -53,24 +55,35 @@ function getLatestPrices(now: number): Promise<LatestPrices> {
 }
 
 /**
- * Prices the given items by exact name, using the instant buy price (falling back to instant sell).
+ * Expected value of a purple: the weight-averaged price of the priced items.
+ */
+export function averagePurple(priced: PricedItem[]): number | undefined {
+  const totalWeight = priced.reduce((sum, item) => sum + item.weight, 0);
+  if (totalWeight === 0) {
+    return undefined;
+  }
+  return priced.reduce((sum, item) => sum + item.price * item.weight, 0) / totalWeight;
+}
+
+/**
+ * Prices the given uniques by exact name, using the instant buy price (falling back to instant sell).
  */
 export function buildPriceList(
-  names: string[],
+  uniques: Unique[],
   ids: Map<string, number>,
   prices: LatestPrices,
 ): PriceList {
   const priced: PricedItem[] = [];
   const missing: string[] = [];
 
-  for (const name of names) {
+  for (const { name, weight } of uniques) {
     const id = ids.get(name.toLowerCase());
     const entry = id == null ? undefined : prices[String(id)];
     const price = entry?.high ?? entry?.low ?? undefined;
     if (price == null) {
       missing.push(name);
     } else {
-      priced.push({ name, price });
+      priced.push({ name, price, weight });
     }
   }
 
@@ -78,7 +91,7 @@ export function buildPriceList(
   return { priced, missing };
 }
 
-export async function priceItems(names: string[]): Promise<PriceList> {
+export async function priceItems(uniques: Unique[]): Promise<PriceList> {
   const [ids, prices] = await Promise.all([getItemIds(), getLatestPrices(Date.now())]);
-  return buildPriceList(names, ids, prices);
+  return buildPriceList(uniques, ids, prices);
 }

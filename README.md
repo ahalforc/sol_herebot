@@ -23,7 +23,7 @@ Here are all of the supported commands:
 
 `/price` - returns the current price for the item that best matches the provided name
 
-`/prices-bulk` - returns the current prices of the tradeable uniques from a raid (`tfa`, `toa`, `tob` or `cox`), most expensive first
+`/prices-bulk` - returns the current prices of the tradeable uniques from a raid (`tfa`, `toa`, `tob` or `cox`), most expensive first, plus the average payout per purple (prices weighted by each unique's drop weighting)
 
 ## API integrations
 

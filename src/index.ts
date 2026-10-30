@@ -18,8 +18,7 @@ const executors: Record<string, (interaction: ChatInputCommandInteraction) => Pr
   "prices-bulk": pricesBulk,
 };
 
-const autocompleters: Record<string, (interaction: AutocompleteInteraction) => Promise<void>> = {
-};
+const autocompleters: Record<string, (interaction: AutocompleteInteraction) => Promise<void>> = {};
 
 /**
  * The discord client.

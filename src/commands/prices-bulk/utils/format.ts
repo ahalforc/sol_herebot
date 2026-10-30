@@ -1,5 +1,5 @@
 import { EmbedBuilder } from "discord.js";
-import type { PriceList } from "./prices.ts";
+import { averagePurple, type PriceList } from "./prices.ts";
 import type { PriceSource } from "./sources.ts";
 
 /**
@@ -27,6 +27,14 @@ export function priceEmbed(source: PriceSource, list: PriceList): EmbedBuilder {
     .setTitle(`${source.name} uniques`)
     .setURL(source.wikiUrl)
     .setDescription(lines.length > 0 ? lines.join("\n") : "No prices available right now.");
+  const average = averagePurple(list.priced);
+  if (average != null) {
+    const rounded = Math.round(average);
+    embed.addFields({
+      name: "Average payout per purple",
+      value: `${formatGp(rounded)} (${Intl.NumberFormat().format(rounded)}gp)`,
+    });
+  }
   if (list.missing.length > 0) {
     embed.setFooter({ text: `No recent price: ${list.missing.join(", ")}` });
   }
