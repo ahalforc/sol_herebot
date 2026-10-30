@@ -25,8 +25,6 @@ Here are all of the supported commands:
 
 `/prices-bulk` - returns the current prices of the tradeable uniques from a raid (`tfa`, `toa`, `tob` or `cox`), most expensive first
 
-`/how-lucky-am-i` - compares your boss collection log (from TempleOSRS) against osrs wiki drop rates, as a luck ratio and in hours. Takes an optional `username` (defaults to your `/iam` name) and an optional `boss` for a per-item breakdown
-
 ## API integrations
 
 This bot is only possible due to the generosity of the OSRS team and the OSRS wiki team.

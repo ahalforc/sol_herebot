@@ -3,7 +3,6 @@ import { createCommand as createIamCommand } from "./commands/iam/index.ts";
 import { createCommand as createPriceCommand } from "./commands/price/index.ts";
 import { createCommand as createRandomraidCommand } from "./commands/randomraid/index.ts";
 import { createCommand as createPricesBulkCommand } from "./commands/prices-bulk/index.ts";
-import { createCommand as createHowLuckyAmICommand } from "./commands/how-lucky-am-i/index.ts";
 
 /**
  * The source-of-truth list of commands that this bot supports.
@@ -17,7 +16,6 @@ const commands = [
   createRandomraidCommand().toJSON(),
   createPriceCommand().toJSON(),
   createPricesBulkCommand().toJSON(),
-  createHowLuckyAmICommand().toJSON(),
 ];
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
