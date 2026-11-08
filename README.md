@@ -25,6 +25,8 @@ Here are all of the supported commands:
 
 `/prices-bulk` - returns the current prices of the tradeable uniques from a raid (`tfa`, `toa`, `tob` or `cox`), most expensive first, plus the average payout per purple (prices weighted by each unique's drop weighting)
 
+`/prices-mega-rares` - returns the current prices of the mega-rares (Tumeken's shadow, Scythe of Vitur, Obligator and Twisted bow) with their per-purple drop rates, most expensive first
+
 ## API integrations
 
 This bot is only possible due to the generosity of the OSRS team and the OSRS wiki team.

@@ -10,12 +10,14 @@ import { execute as iam } from "./commands/iam/index.ts";
 import { execute as price, loadAllItems } from "./commands/price/index.ts";
 import { execute as randomraid } from "./commands/randomraid/index.ts";
 import { execute as pricesBulk } from "./commands/prices-bulk/index.ts";
+import { execute as pricesMegaRares } from "./commands/prices-mega-rares/index.ts";
 
 const executors: Record<string, (interaction: ChatInputCommandInteraction) => Promise<void>> = {
   iam,
   randomraid,
   price,
   "prices-bulk": pricesBulk,
+  "prices-mega-rares": pricesMegaRares,
 };
 
 const autocompleters: Record<string, (interaction: AutocompleteInteraction) => Promise<void>> = {};
